@@ -15,16 +15,16 @@ from app import database as erp
 # Minimal example RBAC: which roles may perform which intents.
 # In production this should check a verified session/JWT, not a raw string.
 ROLE_PERMISSIONS = {
-    "check_stock": {"field_worker", "finance", "admin", "demo"},
-    "get_low_stock_items": {"field_worker", "finance", "admin", "demo"},
-    "create_purchase_request": {"finance", "admin", "demo"},
-    "get_sales_report": {"finance", "admin", "demo"},
-    "get_expense_summary": {"finance", "admin", "demo"},
-    "get_top_expenses": {"finance", "admin", "demo"},
-    "mark_attendance": {"field_worker", "finance", "admin", "demo"},
-    "update_stock": {"admin", "demo"},
-    "get_attendance_summary": {"field_worker", "finance", "admin", "demo"},
-    "check_exam_eligibility": {"field_worker", "finance", "admin", "demo"},
+    "check_stock": {"field_worker", "finance", "sales", "admin", "demo"},
+    "get_low_stock_items": {"field_worker", "finance", "sales", "admin", "demo"},
+    "create_purchase_request": {"finance", "admin"},
+    "get_sales_report": {"sales", "admin"},
+    "get_expense_summary": {"finance", "admin"},
+    "get_top_expenses": {"finance", "admin"},
+    "mark_attendance": {"field_worker", "admin"},
+    "update_stock": {"admin"},
+    "get_attendance_summary": {"field_worker", "admin", "demo"},
+    "check_exam_eligibility": {"field_worker", "admin", "demo"},
 }
 
 

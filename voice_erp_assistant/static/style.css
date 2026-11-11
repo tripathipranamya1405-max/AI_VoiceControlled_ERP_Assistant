@@ -31,8 +31,8 @@ body { margin: 0; min-height: 100vh; padding: 32px; color: var(--ink); font-fami
 .signin-form { display: grid; gap: 9px; }
 .signin-form[hidden], .demo-access[hidden] { display: none; }
 .signin-form label { margin-top: 7px; color: var(--muted); font: 11px var(--mono); text-transform: uppercase; }
-.signin-form input { width: 100%; padding: 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 7px; font: 14px var(--sans); }
-.signin-form input:focus { outline: 2px solid var(--mint); border-color: var(--green); }
+.signin-form input, .signin-form select { width: 100%; padding: 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 7px; font: 14px var(--sans); }
+.signin-form input:focus, .signin-form select:focus { outline: 2px solid var(--mint); border-color: var(--green); }
 .signin-form button, .demo-access button { margin-top: 12px; padding: 12px 14px; color: #fff; border: 0; border-radius: 7px; background: var(--green); font: 700 13px var(--sans); cursor: pointer; }
 .signin-form button:hover, .demo-access button:hover { background: #1c5b49; }
 .signin-status { min-height: 18px; margin: 8px 0 0; color: #b44736; font-size: 12px; }
@@ -105,6 +105,7 @@ kbd { padding: 2px 5px; border: 1px solid rgba(53, 19, 13, .3); border-radius: 4
 .examples-panel h3 { font-size: 24px; }
 .examples-copy { color: var(--muted); font-size: 13px; line-height: 1.5; }
 .example-list { display: grid; gap: 8px; margin-top: 24px; }
+.example-list h4 { margin: 14px 0 0; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: 1px; }
 .example-command { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 9px; padding: 11px; color: var(--ink); text-align: left; border: 1px solid var(--line); border-radius: 9px; background: var(--card); cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
 .example-command[hidden] { display: none !important; }
 .example-command:hover { border-color: var(--green); }

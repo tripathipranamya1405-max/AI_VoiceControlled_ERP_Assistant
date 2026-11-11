@@ -68,6 +68,8 @@ class ERPModuleTests(unittest.TestCase):
         self.assertEqual(sale["quantity"], 1)
         self.assertIsNotNone(inventory["supplier_id"])
         self.assertEqual(inventory["unit_cost"], 85)
+        self.assertEqual(database.get_employee("E-002")["role"], "finance")
+        self.assertEqual(database.get_employee("E-004")["role"], "sales")
 
     def test_requested_voice_commands_classify(self):
         commands = {

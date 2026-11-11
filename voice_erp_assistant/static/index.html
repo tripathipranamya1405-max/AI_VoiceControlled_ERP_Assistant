@@ -13,15 +13,20 @@
       <div class="brand-lockup"><span class="brand-mark">K</span><div><p class="eyebrow">Operations intelligence</p><h1>Kreigner AI Assistant</h1></div></div>
       <p class="eyebrow signin-kicker">ERP workspace access</p>
       <h2 id="signin-title">Your operations, in one conversation.</h2>
-      <p class="signin-description">Sign in with your employee account to access the workspace for your role.</p>
+      <p class="signin-description">Choose Guest access or sign in to a finance or sales workspace.</p>
       <div class="signin-services"><span>Inventory</span><span>Finance</span><span>People operations</span></div>
     </div>
     <div class="signin-panel">
       <p class="eyebrow">Secure workspace</p>
-      <h3>Sign in</h3>
-      <form id="login-form" class="signin-form" hidden>
-        <label for="login-employee">Employee ID</label>
-        <input id="login-employee" type="text" placeholder="E-001" autocomplete="username" required>
+      <h3>Workspace sign in</h3>
+      <form id="login-form" class="signin-form">
+        <label for="login-role">Role</label>
+        <select id="login-role" required>
+          <option value="finance">Financial</option>
+          <option value="sales">Sales</option>
+        </select>
+        <label for="login-employee">Username</label>
+        <input id="login-employee" type="text" placeholder="finance" autocomplete="username" required>
         <label for="login-password">Password</label>
         <input id="login-password" type="password" placeholder="Password" autocomplete="current-password" required>
         <button type="submit">Sign in to Kreigner</button>
@@ -29,8 +34,8 @@
       <p id="signin-status" class="signin-status" role="status"></p>
       <div id="demo-access" class="demo-access" hidden>
         <div class="demo-divider"><span>or</span></div>
-        <p><b>Explore the demo workspace</b><br>Uses sample ERP data and a separate demo session.</p>
-        <button id="demo-btn" type="button">Enter demo workspace</button>
+        <p><b>Continue as Guest</b><br>No username or password needed. Uses sample ERP data.</p>
+        <button id="demo-btn" type="button">Continue as Guest</button>
       </div>
     </div>
   </section>
@@ -59,20 +64,23 @@
           <form id="input-row" class="input-row"><input id="text-input" type="text" placeholder="Ask about stock, attendance, or sales..." autocomplete="off" aria-label="Command"><button id="send-btn" type="submit"><span>Send command</span><kbd>Enter</kbd></button><button id="mic-btn" type="button" class="mic-btn" aria-label="Record voice command"><span class="mic-icon">●</span><span class="mic-label">Speak</span></button></form>
           <p class="input-hint">Voice commands are transcribed, routed through the ERP gateway, and spoken back to you.</p>
         </section>
-        <aside class="examples-panel"><p class="eyebrow">Try a command</p><h3>Move work forward.</h3><p class="examples-copy">Use natural language. Kreigner keeps the conversation context when it needs a detail or confirmation.</p><div class="example-list">
-          <button class="example-command" data-command="Check stock for P-102"><span class="example-icon">▦</span><span><b>Check inventory</b><small>“How many hydraulic valves?”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-roles="finance admin demo" data-command="Get total sales from last month"><span class="example-icon">◒</span><span><b>View sales</b><small>“Show last month’s total.”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-command="How much attendance do I have?"><span class="example-icon">◎</span><span><b>Review attendance</b><small>“What’s my attendance?”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-command="Mark my attendance"><span class="example-icon">✓</span><span><b>Mark attendance</b><small>Writes always ask first.</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-command="Which items are low in stock?"><span class="example-icon">!</span><span><b>Low-stock items</b><small>“Which items need reorder?”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-roles="finance admin demo" data-command="How much did we spend this month?"><span class="example-icon">₹</span><span><b>Review expenses</b><small>“How much did we spend this month?”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-roles="finance admin demo" data-command="Create a purchase request for hydraulic valves"><span class="example-icon">+</span><span><b>Request purchasing</b><small>“Create a request for hydraulic valves.”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-roles="finance admin demo" data-command="Generate this month's sales report"><span class="example-icon">▤</span><span><b>Sales report</b><small>“Generate this month’s report.”</small></span><span class="arrow">↗</span></button>
-        </div><section class="report-downloads" data-roles="finance admin demo" aria-labelledby="sales-report-title"><div class="inventory-heading"><h4 id="sales-report-title">Sales report</h4><select id="report-period" aria-label="Sales report period"><option value="this_month">This month</option><option value="last_month">Last month</option><option value="today">Today</option></select></div><div class="report-links"><a id="download-sales-csv" href="/reports/sales?period=this_month&amp;format=csv" download>Download CSV</a><a id="download-sales-pdf" href="/reports/sales?period=this_month&amp;format=pdf" download>Download PDF</a></div></section><section class="inventory-browser" aria-labelledby="inventory-title"><div class="inventory-heading"><h4 id="inventory-title">Inventory</h4><label class="low-stock-filter"><input id="low-stock-only" type="checkbox"> Low stock</label></div><input id="inventory-search" class="inventory-search" type="search" placeholder="Search products" aria-label="Search inventory"><div id="inventory-list" class="inventory-list" aria-live="polite"></div></section><div class="security-note"><span>⌁</span><p><b>Built for careful action</b>Every update is confirmed before it changes ERP data.</p></div></aside>
+        <aside class="examples-panel"><p class="eyebrow">Role-based commands</p><h3>Move work forward.</h3><p class="examples-copy">Choose a command for your workspace. Guest access is limited to shared, non-financial information.</p><div class="example-list">
+          <h4 data-roles="demo finance sales admin field_worker">Shared workspace</h4>
+          <button class="example-command" data-roles="demo finance sales admin field_worker" data-command="Check stock for P-102"><span class="example-icon">▦</span><span><b>Check inventory</b><small>“How many hydraulic valves?”</small></span><span class="arrow">↗</span></button>
+          <button class="example-command" data-roles="demo finance sales admin field_worker" data-command="Which items are low in stock?"><span class="example-icon">!</span><span><b>Low-stock items</b><small>“Which items need reorder?”</small></span><span class="arrow">↗</span></button>
+          <button class="example-command" data-roles="demo admin field_worker" data-command="How much attendance do I have?"><span class="example-icon">◎</span><span><b>Review attendance</b><small>“What’s my attendance?”</small></span><span class="arrow">↗</span></button>
+          <button class="example-command" data-roles="admin field_worker" data-command="Mark my attendance"><span class="example-icon">✓</span><span><b>Mark attendance</b><small>Writes always ask first.</small></span><span class="arrow">↗</span></button>
+          <h4 data-roles="sales admin">Sales workspace</h4>
+          <button class="example-command" data-roles="sales admin" data-command="Get total sales from last month"><span class="example-icon">◒</span><span><b>View sales</b><small>“Show last month’s total.”</small></span><span class="arrow">↗</span></button>
+          <button class="example-command" data-roles="sales admin" data-command="Generate this month's sales report"><span class="example-icon">▤</span><span><b>Sales report</b><small>“Generate this month’s report.”</small></span><span class="arrow">↗</span></button>
+          <h4 data-roles="finance admin">Finance workspace</h4>
+          <button class="example-command" data-roles="finance admin" data-command="How much did we spend this month?"><span class="example-icon">₹</span><span><b>Review expenses</b><small>“How much did we spend this month?”</small></span><span class="arrow">↗</span></button>
+          <button class="example-command" data-roles="finance admin" data-command="Create a purchase request for hydraulic valves"><span class="example-icon">+</span><span><b>Request purchasing</b><small>“Create a request for hydraulic valves.”</small></span><span class="arrow">↗</span></button>
+        </div><section class="report-downloads" data-roles="sales admin" aria-labelledby="sales-report-title"><div class="inventory-heading"><h4 id="sales-report-title">Sales report</h4><select id="report-period" aria-label="Sales report period"><option value="this_month">This month</option><option value="last_month">Last month</option><option value="today">Today</option></select></div><div class="report-links"><a id="download-sales-csv" href="/reports/sales?period=this_month&amp;format=csv" download>Download CSV</a><a id="download-sales-pdf" href="/reports/sales?period=this_month&amp;format=pdf" download>Download PDF</a></div></section><section class="inventory-browser" aria-labelledby="inventory-title"><div class="inventory-heading"><h4 id="inventory-title">Inventory</h4><label class="low-stock-filter"><input id="low-stock-only" type="checkbox"> Low stock</label></div><input id="inventory-search" class="inventory-search" type="search" placeholder="Search products" aria-label="Search inventory"><div id="inventory-list" class="inventory-list" aria-live="polite"></div></section><div class="security-note"><span>⌁</span><p><b>Built for careful action</b>Every update is confirmed before it changes ERP data.</p></div></aside>
       </div>
     </section>
   </main>
 
-  <script src="/static/app.js?v=20260928-erp-modules"></script>
+  <script src="/static/app.js?v=20261111-role-logins"></script>
 </body>
 </html>

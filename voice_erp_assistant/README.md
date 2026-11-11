@@ -39,7 +39,7 @@ automatically when the app starts.
   expense ledger.
 - **Reports:** “Generate this month's sales report” summarizes sales,
   transaction count, top product, prior-period total, and percentage change.
-  Finance/admin/demo users can download a CSV or PDF in the workspace, or
+  Sales/admin users can download a CSV or PDF in the workspace, or
   call `/reports/sales?period=this_month&format=csv` (use `format=pdf` for PDF).
   Amounts are reported in INR.
 
@@ -269,27 +269,39 @@ needed for local development like this.
 ## Operations dashboard, inventory, and history
 
 The website now shows inventory totals, reorder alerts, monthly sales (for
-finance/admin roles), and the signed-in employee's attendance summary. The
+sales/admin roles), and the signed-in employee's attendance summary. The
 inventory browser can search by product name or ID, filter to items at or
 below their reorder threshold, and open a stock query from an item row.
 Conversation history is stored in the current browser's local storage and
 survives refreshes; use **Clear history** on shared devices.
 
-## Optional sign-in and roles
+## Sign-in and roles
 
-The project still starts in its original demo mode unless
-`ERP_AUTH_ENABLED` is set. To enable sign-in, generate a salted PBKDF2
-password record for each existing employee ID (the password is read without
-echo):
+The website offers three sign-in paths:
+
+| Role | Username | Password |
+|---|---|---|
+| Guest | Not required | Not required |
+| Financial | `finance` | `Finance@123` |
+| Sales | `sales` | `Sales@123` |
+
+These are sample credentials for local evaluation only; change or replace
+them before exposing the app or connecting real ERP data. Guest sessions
+use sample data and can be disabled independently with
+`ERP_DEMO_ENABLED=0`.
+
+Financial and Sales credentials are stored as salted PBKDF2 hashes in the
+prototype. Set `ERP_AUTH_USERS` to override the built-in accounts with
+employee-ID keyed records. To create a record, enter the password when
+prompted (input is hidden):
 
 ```powershell
 python -c "import json; from getpass import getpass; from app.auth import password_record; print(json.dumps({'E-003': password_record(getpass())}))"
 ```
 
-Copy the printed JSON into `ERP_AUTH_USERS`, replacing the example record
-with the generated value. Add one entry per account. For example, `E-001`
-is a field worker, `E-002` is finance, and `E-003` is admin in the seeded
-database:
+Replace the sample JSON with the generated value and add one entry per
+account. Seeded IDs include `E-001` (field worker), `E-002` (finance),
+`E-003` (admin), and `E-004` (sales):
 
 ```powershell
 $env:ERP_AUTH_USERS = '{"E-003":"<generated salt$hash>"}'
@@ -297,19 +309,18 @@ $env:ERP_AUTH_ENABLED = "1"
 uvicorn app.main:app --reload
 ```
 
-The website always opens at the sign-in screen. With auth enabled, employee
-sign-in is required and the demo entry is disabled. With auth unset, the
-screen offers a separate demo-workspace button; protected ERP and voice
-routes still require its short-lived HttpOnly session cookie. API clients
-should retain and resend the `erp_session` cookie from `/auth/login` or
-`/auth/demo`. Roles come from the employee table: admins can use all
-features, finance can view sales, and field workers can access inventory
-and only their own attendance. Set `ERP_COOKIE_SECURE=1` when serving over
-HTTPS. Set `ERP_DEMO_ENABLED=0` to disable local demo entry.
+The website always opens at the sign-in screen. Authentication is enabled
+by default; set `ERP_AUTH_ENABLED=0` to turn off username/password sign-in.
+Guest access remains independent unless disabled with `ERP_DEMO_ENABLED=0`.
+Protected ERP and voice routes require a short-lived HttpOnly session
+cookie. API clients should retain and resend the `erp_session` cookie from
+`/auth/login` or `/auth/demo`. Roles come from the employee table: admins can use all features; Finance
+can review expenses and create purchase requests; Sales can view sales
+reports; and Guest access is limited to shared inventory and attendance
+reviews. Field workers can access inventory and only their own attendance.
+Set `ERP_COOKIE_SECURE=1` when serving over HTTPS.
 
 This authentication is suitable for a local prototype, not production:
 users and sessions are configured/in-memory, sessions are lost on restart,
 and multiple server workers do not share sessions. Use an established
 identity provider and shared session store before connecting real ERP data.
-Keep `ERP_AUTH_ENABLED` set for employee sign-in; for local demo evaluation,
-leave it unset and enter through the explicit demo-workspace option.

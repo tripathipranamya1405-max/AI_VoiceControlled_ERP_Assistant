@@ -68,6 +68,7 @@ class TextResponse(BaseModel):
 class LoginRequest(BaseModel):
     employee_id: str
     password: str
+    role: str | None = None
 
 
 @app.get("/health")
@@ -90,7 +91,7 @@ def set_session_cookie(response: Response, token: str):
 
 @app.post("/auth/login")
 def auth_login(req: LoginRequest, response: Response):
-    token, employee = auth.login(req.employee_id, req.password)
+    token, employee = auth.login(req.employee_id, req.password, req.role)
     set_session_cookie(response, token)
     return {"employee": employee}
 
@@ -155,7 +156,7 @@ def dashboard_summary(
     user = auth.resolve_user(authorization, session_cookie=session_cookie)
     return database.get_dashboard_summary(
         employee_id=user.get("employee_id"),
-        include_sales=user["role"] in {"finance", "admin"},
+        include_sales=user["role"] in {"sales", "admin"},
     )
 
 
@@ -167,7 +168,7 @@ def download_sales_report(
     session_cookie: str | None = Cookie(default=None, alias="erp_session"),
 ):
     user = auth.resolve_user(authorization, session_cookie=session_cookie)
-    if user["role"] not in {"finance", "admin", "demo"}:
+    if user["role"] not in {"sales", "admin"}:
         raise HTTPException(status_code=403, detail="Sales reports are not available for this role.")
     if period not in {"today", "this_month", "last_month"}:
         raise HTTPException(status_code=400, detail="Period must be today, this_month, or last_month.")

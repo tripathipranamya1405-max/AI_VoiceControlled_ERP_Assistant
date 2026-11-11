@@ -162,6 +162,13 @@ def init_db(seed: bool = True):
                         ("E-003", "Priya Menon", "admin"),
                     ],
                 )
+            c.executemany(
+                "INSERT OR IGNORE INTO employees (employee_id, name, role) VALUES (?, ?, ?)",
+                [
+                    ("E-002", "Vikram Nair", "finance"),
+                    ("E-004", "Arjun Mehta", "sales"),
+                ],
+            )
             c.execute("SELECT COUNT(*) FROM attendance")
             if c.fetchone()[0] == 0:
                 # Seed ~20 days of attendance history per employee so

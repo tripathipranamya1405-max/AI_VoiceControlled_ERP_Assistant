@@ -27,6 +27,7 @@ const inventorySearch = document.getElementById("inventory-search");
 const lowStockOnly = document.getElementById("low-stock-only");
 const inventoryList = document.getElementById("inventory-list");
 const loginForm = document.getElementById("login-form");
+const loginRole = document.getElementById("login-role");
 const authUser = document.getElementById("auth-user");
 const logoutBtn = document.getElementById("logout-btn");
 const signinScreen = document.getElementById("signin-screen");
@@ -292,7 +293,7 @@ async function initializeAuth() {
     demoAccess.hidden = !status.demo_enabled;
     signinStatus.classList.remove("error");
     signinStatus.textContent = authRequired
-      ? "Use your assigned employee account."
+      ? "Sign in as Financial or Sales, or continue as Guest."
       : "Employee sign-in is not configured for this instance.";
     const me = await apiFetch("/auth/me");
     if (me.ok) {
@@ -308,14 +309,14 @@ async function initializeAuth() {
 
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const employeeId = document.getElementById("login-employee").value.trim();
+  const username = document.getElementById("login-employee").value.trim();
   const password = document.getElementById("login-password").value;
   setStatus("Signing in...");
   try {
     const res = await fetch("/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ employee_id: employeeId, password }),
+      body: JSON.stringify({ employee_id: username, password, role: loginRole.value }),
     });
     const data = await parseJsonResponse(res);
     if (!res.ok) throw new Error(data?.detail || "Sign in failed");
@@ -329,6 +330,11 @@ loginForm.addEventListener("submit", async (event) => {
     signinStatus.classList.add("error");
     signinStatus.textContent = err.message;
   }
+});
+
+loginRole.addEventListener("change", () => {
+  const username = document.getElementById("login-employee");
+  username.placeholder = loginRole.value === "sales" ? "sales" : "finance";
 });
 
 demoBtn.addEventListener("click", async () => {
