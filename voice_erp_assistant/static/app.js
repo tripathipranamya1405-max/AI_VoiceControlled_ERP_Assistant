@@ -163,6 +163,9 @@ function commandWithContext(command) {
   if (contextMode === "sales" && !/(today|this month|last month)/i.test(command)) {
     return `${command} for ${selected}`;
   }
+  if (contextMode === "attendance" && !/\bE-\d{2,5}\b/i.test(command)) {
+    return `${command} for employee ${selected}`;
+  }
   return command;
 }
 
@@ -293,7 +296,7 @@ async function initializeAuth() {
     demoAccess.hidden = !status.demo_enabled;
     signinStatus.classList.remove("error");
     signinStatus.textContent = authRequired
-      ? "Sign in as Financial or Sales, or continue as Guest."
+      ? "Sign in to Finance, Sales, or Attendance, or continue as Guest."
       : "Employee sign-in is not configured for this instance.";
     const me = await apiFetch("/auth/me");
     if (me.ok) {
@@ -334,7 +337,10 @@ loginForm.addEventListener("submit", async (event) => {
 
 loginRole.addEventListener("change", () => {
   const username = document.getElementById("login-employee");
-  username.placeholder = loginRole.value === "sales" ? "sales" : "finance";
+  if (!username.value || ["finance", "sales", "attendance"].includes(username.value.toLowerCase())) {
+    username.value = loginRole.value;
+  }
+  username.placeholder = loginRole.value;
 });
 
 demoBtn.addEventListener("click", async () => {

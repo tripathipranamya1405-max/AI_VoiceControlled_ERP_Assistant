@@ -13,7 +13,7 @@
       <div class="brand-lockup"><span class="brand-mark">K</span><div><p class="eyebrow">Operations intelligence</p><h1>Kreigner AI Assistant</h1></div></div>
       <p class="eyebrow signin-kicker">ERP workspace access</p>
       <h2 id="signin-title">Your operations, in one conversation.</h2>
-      <p class="signin-description">Choose Guest access or sign in to a finance or sales workspace.</p>
+      <p class="signin-description">Choose Guest access or sign in to a finance, sales, or attendance workspace.</p>
       <div class="signin-services"><span>Inventory</span><span>Finance</span><span>People operations</span></div>
     </div>
     <div class="signin-panel">
@@ -24,6 +24,7 @@
         <select id="login-role" required>
           <option value="finance">Financial</option>
           <option value="sales">Sales</option>
+          <option value="attendance">Attendance</option>
         </select>
         <label for="login-employee">Username</label>
         <input id="login-employee" type="text" placeholder="finance" autocomplete="username" required>
@@ -65,11 +66,13 @@
           <p class="input-hint">Voice commands are transcribed, routed through the ERP gateway, and spoken back to you.</p>
         </section>
         <aside class="examples-panel"><p class="eyebrow">Role-based commands</p><h3>Move work forward.</h3><p class="examples-copy">Choose a command for your workspace. Guest access is limited to shared, non-financial information.</p><div class="example-list">
-          <h4 data-roles="demo finance sales admin field_worker">Shared workspace</h4>
-          <button class="example-command" data-roles="demo finance sales admin field_worker" data-command="Check stock for P-102"><span class="example-icon">▦</span><span><b>Check inventory</b><small>“How many hydraulic valves?”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-roles="demo finance sales admin field_worker" data-command="Which items are low in stock?"><span class="example-icon">!</span><span><b>Low-stock items</b><small>“Which items need reorder?”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-roles="demo admin field_worker" data-command="How much attendance do I have?"><span class="example-icon">◎</span><span><b>Review attendance</b><small>“What’s my attendance?”</small></span><span class="arrow">↗</span></button>
-          <button class="example-command" data-roles="admin field_worker" data-command="Mark my attendance"><span class="example-icon">✓</span><span><b>Mark attendance</b><small>Writes always ask first.</small></span><span class="arrow">↗</span></button>
+          <h4 data-roles="demo finance sales admin field_worker attendance">Shared workspace</h4>
+          <button class="example-command" data-roles="demo finance sales admin field_worker attendance" data-command="Check stock for P-102"><span class="example-icon">▦</span><span><b>Check inventory</b><small>“How many hydraulic valves?”</small></span><span class="arrow">↗</span></button>
+          <button class="example-command" data-roles="demo finance sales admin field_worker attendance" data-command="Which items are low in stock?"><span class="example-icon">!</span><span><b>Low-stock items</b><small>“Which items need reorder?”</small></span><span class="arrow">↗</span></button>
+          <button class="example-command" data-roles="demo admin field_worker attendance" data-command="How much attendance do I have?"><span class="example-icon">◎</span><span><b>Review attendance</b><small>“What’s my attendance?”</small></span><span class="arrow">↗</span></button>
+          <button class="example-command" data-roles="admin field_worker attendance" data-command="Mark attendance for E-001"><span class="example-icon">✓</span><span><b>Mark attendance</b><small>Writes always ask first.</small></span><span class="arrow">↗</span></button>
+          <h4 data-roles="attendance admin">Attendance workspace</h4>
+          <button class="example-command" data-roles="attendance admin" data-command="Update attendance for E-001 to absent"><span class="example-icon">↻</span><span><b>Update employee attendance</b><small>Set a record to present or absent.</small></span><span class="arrow">↗</span></button>
           <h4 data-roles="sales admin">Sales workspace</h4>
           <button class="example-command" data-roles="sales admin" data-command="Get total sales from last month"><span class="example-icon">◒</span><span><b>View sales</b><small>“Show last month’s total.”</small></span><span class="arrow">↗</span></button>
           <button class="example-command" data-roles="sales admin" data-command="Generate this month's sales report"><span class="example-icon">▤</span><span><b>Sales report</b><small>“Generate this month’s report.”</small></span><span class="arrow">↗</span></button>

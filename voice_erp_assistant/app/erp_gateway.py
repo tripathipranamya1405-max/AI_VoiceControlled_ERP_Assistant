@@ -15,16 +15,17 @@ from app import database as erp
 # Minimal example RBAC: which roles may perform which intents.
 # In production this should check a verified session/JWT, not a raw string.
 ROLE_PERMISSIONS = {
-    "check_stock": {"field_worker", "finance", "sales", "admin", "demo"},
-    "get_low_stock_items": {"field_worker", "finance", "sales", "admin", "demo"},
+    "check_stock": {"field_worker", "finance", "sales", "attendance", "admin", "demo"},
+    "get_low_stock_items": {"field_worker", "finance", "sales", "attendance", "admin", "demo"},
     "create_purchase_request": {"finance", "admin"},
     "get_sales_report": {"sales", "admin"},
     "get_expense_summary": {"finance", "admin"},
     "get_top_expenses": {"finance", "admin"},
-    "mark_attendance": {"field_worker", "admin"},
+    "update_attendance": {"attendance", "admin"},
+    "mark_attendance": {"field_worker", "attendance", "admin"},
     "update_stock": {"admin"},
-    "get_attendance_summary": {"field_worker", "admin", "demo"},
-    "check_exam_eligibility": {"field_worker", "admin", "demo"},
+    "get_attendance_summary": {"field_worker", "attendance", "admin", "demo"},
+    "check_exam_eligibility": {"field_worker", "attendance", "admin", "demo"},
 }
 
 
@@ -40,7 +41,10 @@ def dispatch(
         return {"ok": False, "error": f"Role '{role}' is not permitted to perform '{intent}'."}
     if (
         role == "field_worker"
-        and intent in {"mark_attendance", "get_attendance_summary", "check_exam_eligibility"}
+        and intent in {
+            "mark_attendance", "update_attendance",
+            "get_attendance_summary", "check_exam_eligibility",
+        }
         and entities.get("employee_id") != actor_employee_id
     ):
         return {"ok": False, "error": "You can only access your own attendance records."}
@@ -69,7 +73,16 @@ def dispatch(
         return {"ok": True, "expenses": erp.get_top_expenses()}
 
     if intent == "mark_attendance":
-        return erp.mark_attendance(entities["employee_id"], status="present")
+        return erp.mark_attendance(
+            entities["employee_id"], status=entities.get("status", "present"),
+            day=entities.get("date"),
+        )
+
+    if intent == "update_attendance":
+        return erp.mark_attendance(
+            entities["employee_id"], status=entities["status"],
+            day=entities.get("date"),
+        )
 
     if intent == "update_stock":
         return erp.update_stock(entities["item_id"], entities["delta"])
@@ -134,6 +147,9 @@ def format_reply(intent: str, entities: dict, result: dict) -> str:
 
     if intent == "mark_attendance":
         return f"Attendance marked as {result['status']} for {result['employee_id']} on {result['date']}."
+
+    if intent == "update_attendance":
+        return f"Attendance updated to {result['status']} for {result['employee_id']} on {result['date']}."
 
     if intent == "update_stock":
         return (f"Updated {result['item_id']}: {result['old_quantity']} → "

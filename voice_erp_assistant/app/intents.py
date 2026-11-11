@@ -23,6 +23,10 @@ INTENTS = {
         "required_entities": ["employee_id"],  # auto-filled from session if logged in
         "is_write": True,
     },
+    "update_attendance": {
+        "required_entities": ["employee_id", "status"],
+        "is_write": True,
+    },
     "get_sales_report": {
         "required_entities": ["period"],
         "is_write": False,

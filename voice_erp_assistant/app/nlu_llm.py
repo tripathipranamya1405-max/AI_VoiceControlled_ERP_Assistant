@@ -45,6 +45,8 @@ Given a user's spoken request, output ONLY a JSON object (no other text, no mark
     - item_name (free text, e.g. "hydraulic valve") -- if the item was named instead of coded
     - employee_id (e.g. "E-001") -- only if a clear code was spoken
     - employee_name (free text, e.g. "Asha Rao") -- if the employee was named instead of coded
+    - status: "present" or "absent" for attendance
+    - date: attendance date in YYYY-MM-DD when explicitly provided
     - period: one of "today", "this_month", "last_month"
     - delta: integer, positive to add stock, negative to remove stock
     - quantity: positive integer requested on a purchase request
@@ -58,6 +60,7 @@ Examples of the kind of phrasing variation you must handle:
 "Which items are low in stock?" -> {{"intent": "get_low_stock_items", "entities": {{}}}}
 "Create a purchase request for 24 units of P-102" -> {{"intent": "create_purchase_request", "entities": {{"item_id": "P-102", "quantity": 24}}}}
 "Mark attendance for Asha Rao" -> {{"intent": "mark_attendance", "entities": {{"employee_name": "Asha Rao"}}}}
+"Update attendance for E-001 to absent" -> {{"intent": "update_attendance", "entities": {{"employee_id": "E-001", "status": "absent"}}}}
 "Give me last month's revenue" -> {{"intent": "get_sales_report", "entities": {{"period": "last_month"}}}}
 "How much did we spend this month?" -> {{"intent": "get_expense_summary", "entities": {{"period": "this_month"}}}}
 "Show me the highest expenses" -> {{"intent": "get_top_expenses", "entities": {{}}}}

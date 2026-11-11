@@ -64,6 +64,7 @@ CLARIFY_PROMPTS = {
     "employee_id": "I don't have your employee ID on file for this session. What's your employee ID?",
     "delta": "How many units?",
     "quantity": "How many units should I request?",
+    "status": "Should the attendance status be present or absent?",
 }
 
 
@@ -202,6 +203,9 @@ def handle_utterance(
         elif value is None and entity_name == "quantity":
             quantity_match = re.fullmatch(r"\s*(\d+)(?:\s*(?:units?|pieces?))?\s*", text, re.IGNORECASE)
             value = int(quantity_match.group(1)) if quantity_match else None
+        elif value is None and entity_name == "status":
+            status_match = re.fullmatch(r"\s*(present|absent)\s*", text, re.IGNORECASE)
+            value = status_match.group(1).lower() if status_match else None
 
         session.pending_entities[entity_name] = value
         session.awaiting_clarification_for = None
@@ -284,7 +288,13 @@ def _continue_pending(session: Session) -> dict:
 
 def _confirmation_prompt(intent: str, entities: dict) -> str:
     if intent == "mark_attendance":
-        return f"Mark attendance as present for employee {entities.get('employee_id')}. Confirm? (yes/no)"
+        status = entities.get("status", "present")
+        return (f"Mark attendance as {status} for employee {entities.get('employee_id')} "
+                f"on {entities.get('date', 'today')}. Confirm? (yes/no)")
+    if intent == "update_attendance":
+        return (f"Update attendance to {entities.get('status')} for employee "
+                f"{entities.get('employee_id')} on {entities.get('date', 'today')}. "
+                "Confirm? (yes/no)")
     if intent == "update_stock":
         verb = "add" if entities.get("delta", 0) >= 0 else "remove"
         return (f"{verb.capitalize()} {abs(entities.get('delta', 0))} units "

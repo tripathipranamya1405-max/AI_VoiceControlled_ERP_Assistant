@@ -79,10 +79,54 @@ class ERPModuleTests(unittest.TestCase):
             "What was our total expenditure last month?": "get_expense_summary",
             "Show me the highest expenses": "get_top_expenses",
             "Generate this month's sales report": "get_sales_report",
+            "Update attendance for E-001 to absent": "update_attendance",
+            "Mark attendance for E-001 as present": "mark_attendance",
         }
         for command, expected_intent in commands.items():
             with self.subTest(command=command):
                 self.assertEqual(classify(command).intent, expected_intent)
+
+    def test_attendance_manager_can_confirm_employee_attendance_updates(self):
+        first = handle_utterance(
+            "attendance-manager-test",
+            "Update attendance for E-001 to absent",
+            employee_id="E-005",
+            role="attendance",
+        )
+        self.assertTrue(first["awaiting_confirmation"])
+        self.assertIn("absent", first["reply"])
+
+        updated = handle_utterance(
+            "attendance-manager-test",
+            "yes",
+            employee_id="E-005",
+            role="attendance",
+        )
+        self.assertTrue(updated["result"]["ok"])
+        self.assertEqual(updated["result"]["employee_id"], "E-001")
+        self.assertEqual(updated["result"]["status"], "absent")
+        with database.get_conn() as conn:
+            row = conn.execute(
+                "SELECT status FROM attendance WHERE employee_id = ? AND date = ?",
+                ("E-001", updated["result"]["date"]),
+            ).fetchone()
+        self.assertEqual(row["status"], "absent")
+
+    def test_attendance_manager_can_supply_status_after_clarification(self):
+        first = handle_utterance(
+            "attendance-status-test",
+            "Update attendance for E-001",
+            employee_id="E-005",
+            role="attendance",
+        )
+        self.assertTrue(first["awaiting_clarification"])
+        self.assertIn("present or absent", first["reply"])
+
+        second = handle_utterance("attendance-status-test", "present", role="attendance")
+        self.assertTrue(second["awaiting_confirmation"])
+        updated = handle_utterance("attendance-status-test", "yes", role="attendance")
+        self.assertTrue(updated["result"]["ok"])
+        self.assertEqual(updated["result"]["status"], "present")
 
     def test_purchase_request_requires_quantity_and_confirmation(self):
         session_id = "purchase-test-session"

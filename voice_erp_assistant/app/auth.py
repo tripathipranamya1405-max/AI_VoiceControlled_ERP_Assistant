@@ -23,6 +23,10 @@ _DEFAULT_USERS = {
         "E-004",
         "c5b7aade625b9df8396e2105df4e7a12$9568b0bd86167e945165226e83ae1717dd1a973de3d3a2fc0257f4f8c148ed2f",
     ),
+    "ATTENDANCE": (
+        "E-005",
+        "a4b7c19d50e2836a71f4c8209b5d3e6f$ff3e3140fcc64c3ced83501c3ff988a8d5518ded617baba8f4c259a4e724a991",
+    ),
 }
 
 

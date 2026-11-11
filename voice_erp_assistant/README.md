@@ -30,6 +30,9 @@ The seeded SQLite ERP includes suppliers, purchase requests and line items,
 expenses, and product-linked sales. Existing databases are upgraded
 automatically when the app starts.
 
+- **Attendance:** sign in with the Attendance role to mark or update any
+  employee's record as present or absent. Each change requires confirmation;
+  optionally include `today`, `yesterday`, or a `YYYY-MM-DD` date.
 - **Procurement:** “Which items are low in stock?” lists items at their
   reorder threshold. “Create a purchase request for hydraulic valves” asks
   for a quantity, previews the supplier and estimated total, then requires
@@ -277,20 +280,21 @@ survives refreshes; use **Clear history** on shared devices.
 
 ## Sign-in and roles
 
-The website offers three sign-in paths:
+The website offers four sign-in paths:
 
 | Role | Username | Password |
 |---|---|---|
 | Guest | Not required | Not required |
 | Financial | `finance` | `Finance@123` |
 | Sales | `sales` | `Sales@123` |
+| Attendance | `attendance` | `Attendance@123` |
 
 These are sample credentials for local evaluation only; change or replace
 them before exposing the app or connecting real ERP data. Guest sessions
 use sample data and can be disabled independently with
 `ERP_DEMO_ENABLED=0`.
 
-Financial and Sales credentials are stored as salted PBKDF2 hashes in the
+Financial, Sales, and Attendance credentials are stored as salted PBKDF2 hashes in the
 prototype. Set `ERP_AUTH_USERS` to override the built-in accounts with
 employee-ID keyed records. To create a record, enter the password when
 prompted (input is hidden):
@@ -301,7 +305,7 @@ python -c "import json; from getpass import getpass; from app.auth import passwo
 
 Replace the sample JSON with the generated value and add one entry per
 account. Seeded IDs include `E-001` (field worker), `E-002` (finance),
-`E-003` (admin), and `E-004` (sales):
+`E-003` (admin), `E-004` (sales), and `E-005` (attendance):
 
 ```powershell
 $env:ERP_AUTH_USERS = '{"E-003":"<generated salt$hash>"}'
@@ -316,8 +320,10 @@ Protected ERP and voice routes require a short-lived HttpOnly session
 cookie. API clients should retain and resend the `erp_session` cookie from
 `/auth/login` or `/auth/demo`. Roles come from the employee table: admins can use all features; Finance
 can review expenses and create purchase requests; Sales can view sales
-reports; and Guest access is limited to shared inventory and attendance
-reviews. Field workers can access inventory and only their own attendance.
+reports; Attendance can mark and update employees' attendance and review
+attendance summaries; Guest access is limited to shared inventory and
+attendance reviews. Field workers can access inventory and only their own
+attendance.
 Set `ERP_COOKIE_SECURE=1` when serving over HTTPS.
 
 This authentication is suitable for a local prototype, not production:

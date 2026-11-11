@@ -60,7 +60,7 @@ def init_db(seed: bool = True):
             CREATE TABLE IF NOT EXISTS employees (
                 employee_id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
-                role TEXT NOT NULL  -- 'field_worker', 'finance', 'admin'
+                role TEXT NOT NULL  -- 'field_worker', 'finance', 'sales', 'attendance', 'admin'
             )
         """)
         c.execute("""
@@ -167,6 +167,7 @@ def init_db(seed: bool = True):
                 [
                     ("E-002", "Vikram Nair", "finance"),
                     ("E-004", "Arjun Mehta", "sales"),
+                    ("E-005", "Neha Kapoor", "attendance"),
                 ],
             )
             c.execute("SELECT COUNT(*) FROM attendance")
@@ -490,6 +491,12 @@ def check_exam_eligibility(employee_id: str, threshold: float = 75.0):
 
 def mark_attendance(employee_id: str, status: str = "present", day: str = None):
     day = day or date.today().isoformat()
+    if status not in {"present", "absent"}:
+        return {"ok": False, "error": "Attendance status must be present or absent."}
+    try:
+        date.fromisoformat(day)
+    except (TypeError, ValueError):
+        return {"ok": False, "error": "Attendance date must use YYYY-MM-DD format."}
     with get_conn() as conn:
         emp = conn.execute(
             "SELECT * FROM employees WHERE employee_id = ?", (employee_id,)

@@ -5,10 +5,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 from fastapi import HTTPException
+from fastapi.testclient import TestClient
 
 from app import auth, database
 from app.erp_gateway import ROLE_PERMISSIONS, dispatch
-from app.main import dashboard_summary, download_sales_report
+from app.main import app, dashboard_summary, download_sales_report
 
 
 class AuthenticationTests(unittest.TestCase):
@@ -34,9 +35,28 @@ class AuthenticationTests(unittest.TestCase):
     def test_finance_and_sales_credentials_match_their_roles(self):
         _, finance = auth.login("finance", "Finance@123", "finance")
         _, sales = auth.login("sales", "Sales@123", "sales")
+        _, attendance = auth.login("attendance", "Attendance@123", "attendance")
 
         self.assertEqual((finance["employee_id"], finance["role"]), ("E-002", "finance"))
         self.assertEqual((sales["employee_id"], sales["role"]), ("E-004", "sales"))
+        self.assertEqual((attendance["employee_id"], attendance["role"]), ("E-005", "attendance"))
+
+    def test_attendance_login_endpoint_creates_authenticated_session(self):
+        with TestClient(app) as client:
+            response = client.post(
+                "/auth/login",
+                json={
+                    "employee_id": "attendance",
+                    "password": "Attendance@123",
+                    "role": "attendance",
+                },
+            )
+            self.assertEqual(response.status_code, 200, response.text)
+            self.assertEqual(response.json()["employee"]["role"], "attendance")
+
+            current_user = client.get("/auth/me")
+            self.assertEqual(current_user.status_code, 200)
+            self.assertEqual(current_user.json()["employee"]["employee_id"], "E-005")
 
     def test_wrong_password_or_selected_role_is_rejected(self):
         with self.assertRaises(HTTPException) as bad_password:
@@ -58,6 +78,8 @@ class AuthenticationTests(unittest.TestCase):
         self.assertNotIn("sales", ROLE_PERMISSIONS["create_purchase_request"])
         self.assertIn("finance", ROLE_PERMISSIONS["get_expense_summary"])
         self.assertNotIn("finance", ROLE_PERMISSIONS["get_sales_report"])
+        self.assertIn("attendance", ROLE_PERMISSIONS["update_attendance"])
+        self.assertNotIn("attendance", ROLE_PERMISSIONS["get_expense_summary"])
         self.assertIn("demo", ROLE_PERMISSIONS["get_attendance_summary"])
         self.assertNotIn("demo", ROLE_PERMISSIONS["get_expense_summary"])
         self.assertNotIn("demo", ROLE_PERMISSIONS["mark_attendance"])
@@ -70,6 +92,7 @@ class AuthenticationTests(unittest.TestCase):
             ("get_expense_summary", "sales"),
             ("get_expense_summary", "demo"),
             ("mark_attendance", "demo"),
+            ("update_attendance", "finance"),
         ]
         for intent, role in forbidden_commands:
             with self.subTest(intent=intent, role=role):

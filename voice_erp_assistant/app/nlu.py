@@ -52,6 +52,9 @@ _INTENT_PATTERNS = [
     ("update_stock", [
         r"\b(add|remove|restock|consume|use)\b.*\b(units?|stock|item)\b",
     ]),
+    ("update_attendance", [
+        r"\b(update|change|correct|edit|set)\b.*\battendance\b",
+    ]),
     ("mark_attendance", [
         r"\bmark\b.*\battendance\b",
         r"\bclock (in|out)\b",
@@ -104,12 +107,31 @@ def _extract_entities(text: str, intent: str) -> dict:
     emp_match = _EMPLOYEE_ID_RE.search(text)
     if emp_match:
         entities["employee_id"] = emp_match.group(1).upper()
-    elif intent in ("mark_attendance", "get_attendance_summary", "check_exam_eligibility"):
+    elif intent in (
+        "mark_attendance", "update_attendance",
+        "get_attendance_summary", "check_exam_eligibility",
+    ):
         value, confirm_label = entity_resolver.resolve_with_confidence("employee", text)
         if value:
             entities["employee_id"] = value
             if confirm_label:
                 uncertain["employee_id"] = confirm_label
+
+    if intent in ("mark_attendance", "update_attendance"):
+        status_match = re.search(r"\b(present|absent)\b", text_lower)
+        if status_match:
+            entities["status"] = status_match.group(1)
+        date_match = re.search(r"\b(20\d{2}-\d{2}-\d{2})\b", text_lower)
+        if date_match:
+            entities["date"] = date_match.group(1)
+        elif "yesterday" in text_lower:
+            from datetime import date, timedelta
+
+            entities["date"] = (date.today() - timedelta(days=1)).isoformat()
+        elif "today" in text_lower:
+            from datetime import date
+
+            entities["date"] = date.today().isoformat()
 
     for phrase, period in _PERIOD_MAP.items():
         if phrase in text_lower:
